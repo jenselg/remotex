@@ -1,0 +1,4 @@
+#!/usr/bin/env node
+
+// require the entry point of the app
+require('../app.js')

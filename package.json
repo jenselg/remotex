@@ -1,0 +1,25 @@
+{
+  "name": "remotex",
+  "version": "1.0.0",
+  "description": "Process requests and/or commands in a decentralized way through the IPFS network",
+  "main": "app.js",
+  "scripts": {
+    "remotex": "node app.js"
+  },
+  "keywords": [
+    "IPFS",
+    "remote",
+    "control",
+    "process",
+    "command",
+    "request"
+  ],
+  "author": "Jensel Gatchalian",
+  "license": "MIT",
+  "dependencies": {
+    "ipfs": "^0.34.4",
+    "ipfs-pubsub-room": "^1.4.1",
+    "node-rsa": "^1.0.5",
+    "yargs": "^13.2.2"
+  }
+}
