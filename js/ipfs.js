@@ -92,7 +92,13 @@ var id = () =>
       if (err) { throw err }
 
       // save to config file and print to cli
-      console.log('ID: ' + identity.id)
+      console.log('\n RemoteX ID: ' + identity.id + '\n')
+      console.log(' - Add your RemoteX ID on remote systems to connect to this system')
+      console.log(' - Make sure to whitelist said remote systems on this system\n')
+      console.log(' From another system:')
+      console.log(' remotex connections add ' + identity.id + '\n')
+      console.log(' From this system:')
+      console.log(' remotex whitelist add <Remote System RemoteX ID>\n')
       configLib.id('update', identity.id)
 
     })

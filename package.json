@@ -17,8 +17,11 @@
   "author": "Jensel Gatchalian",
   "license": "MIT",
   "dependencies": {
+    "chalk": "^2.4.2",
+    "chokidar": "^2.1.5",
     "ipfs": "^0.34.4",
     "ipfs-pubsub-room": "^1.4.1",
+    "language-detect": "^1.1.0",
     "node-rsa": "^1.0.5",
     "yargs": "^13.2.2"
   }

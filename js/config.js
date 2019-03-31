@@ -1,25 +1,68 @@
 // system libs
 const fsLib = require('fs')
 const osLib = require('os')
+const chalk = require('chalk')
 
 // directories
 const homeDir = osLib.homedir()
 const dataDir = homeDir + '/RemoteX'
+const execDir = dataDir + '/exec'
+const logDir = dataDir + '/logs'
+const filesDir = dataDir + '/files'
 
-// app config file
+// files
 const configFile = dataDir + '/config.json'
+const receiveProcessFile = dataDir + '/receive-process.json'
+const sendProcessFile = dataDir + '/send-process.json'
 
 // init
 var init = () =>
 {
 
-  // dataDir doesnt exist so create it
+  // create dataDir if it doesnt exist
   if (!fsLib.existsSync(dataDir))
   {
-
-    // create dataDir
     fsLib.mkdirSync(dataDir)
+  }
 
+  // create execDir if it doesnt exist
+  if (!fsLib.existsSync(execDir))
+  {
+    fsLib.mkdirSync(execDir)
+  }
+
+  // create logDir if it doesnt exist
+  if (!fsLib.existsSync(logDir))
+  {
+    fsLib.mkdirSync(logDir)
+  }
+
+  // create filesDir if it doesnt exist
+  if (!fsLib.existsSync(filesDir))
+  {
+    fsLib.mkdirSync(filesDir)
+  }
+
+  // create process file if it doesnt exist, and inject empty array inside it
+  if (!fsLib.existsSync(receiveProcessFile))
+  {
+    fsLib.writeFileSync(receiveProcessFile, JSON.stringify( [] ))
+    console.log(' - Created new receive process file!')
+  }
+  else
+  {
+    console.log(' - Loaded existing receive process file!')
+  }
+
+  // create process file if it doesnt exist, and inject empty array inside it
+  if (!fsLib.existsSync(sendProcessFile))
+  {
+    fsLib.writeFileSync(sendProcessFile, JSON.stringify( [] ))
+    console.log(' - Created new send process file!')
+  }
+  else
+  {
+    console.log(' - Loaded existing send process file!')
   }
 
   // config file exists
@@ -33,7 +76,7 @@ var init = () =>
     error('clear')
 
     // log and return
-    console.log('Loaded existing config file!')
+    console.log(' - Loaded existing config file!\n')
     return session
 
   }
@@ -51,7 +94,7 @@ var init = () =>
     fsLib.writeFileSync(configFile, JSON.stringify(session))
 
     // log and return
-    console.log('Created new config file!')
+    console.log(' - Created new config file!\n')
     return session
 
   }
@@ -85,42 +128,80 @@ var reset = () =>
 
 }
 
+// read config to session
+var read = () =>
+{
+  session = JSON.parse(fsLib.readFileSync(configFile))
+}
+
 // whitelisting peers that are allowed to query
 // peer should be array for adding: [peerid, friendlyname]
 // peer should be Qm hash for removing
 var whitelist = (command, peer) =>
 {
 
+  // force peer value to string
+  if (peer)
+  {
+    peer = peer.toString()
+  }
+
   // command options
   switch (command)
   {
 
-    // resolve friendly name, return Qm hash, if it exists in the config file
-    case 'resolve':
-      // provided peer argument is a Qm hash
-      if (peer.substring(0, 2) == 'Qm')
-      {
-      }
-      // provided peer argument is a friendly name
-      else
-      {
-      }
-    break
-
     // add peer allowed to communicate
     case 'add':
-      session['whitelist'].push(peer)
-      save()
+      if (peer !== undefined && peer.substring(0,2) == 'Qm')
+      {
+        read()
+        if (session['whitelist'].indexOf(peer) >= 0)
+        {
+          console.log('\n' + chalk.yellowBright(peer) + ' ' + chalk.redBright('is already on the whitelist!') + '\n')
+        }
+        else
+        {
+          let peerDir = filesDir + '/' + peer
+          if (!fsLib.existsSync(peerDir))
+          {
+            fsLib.mkdirSync(peerDir)
+          }
+          session['whitelist'].push(peer)
+          console.log('\n' + chalk.greenBright('Added') + ' ' + chalk.yellowBright(peer) + ' ' + chalk.greenBright('to the whitelist!') + '\n')
+          save()
+        }
+      }
+      else
+      {
+        console.log(chalk.redBright('\nInvalid peer argument!\n'))
+      }
     break
 
     // remove peer from allowed
     case 'remove':
-      session['whitelist'] = session['whitelist'].filter(i => i[0] !== peer)
-      save()
+      if (peer !== undefined && peer.substring(0,2) == 'Qm')
+      {
+        read()
+        if (session['whitelist'].indexOf(peer) >= 0)
+        {
+          session['whitelist'] = session['whitelist'].filter(i => i !== peer)
+          console.log('\n' + chalk.greenBright('Removed') + ' ' + chalk.yellowBright(peer) + ' ' + chalk.greenBright('from the whitelist!') + '\n')
+          save()
+        }
+        else
+        {
+          console.log('\n' + chalk.yellowBright(peer) + ' ' + chalk.redBright('is not on the whitelist!') + '\n')
+        }
+      }
+      else
+      {
+        console.log(chalk.redBright('\nInvalid peer argument!\n'))
+      }
     break
 
     // list all peers that are allowed to communicate
     case 'list':
+      read()
       return session['whitelist']
     break
 
@@ -137,36 +218,63 @@ var whitelist = (command, peer) =>
 var connections = (command, peer) =>
 {
 
+  // force peer value to string
+  if (peer)
+  {
+    peer = peer.toString()
+  }
+
   // command options
   switch (command)
   {
 
-    // resolve friendly name, returns Qm hash, if it exists in the config file
-    case 'resolve':
-      // provided peer argument is a Qm hash
-      if (peer.substring(0, 2) == 'Qm')
+    // add connection
+    case 'add':
+      if (peer !== undefined && peer.substring(0,2) == 'Qm')
       {
+        read()
+        if (session['connections'].indexOf(peer) >= 0)
+        {
+          console.log('\n' + chalk.yellowBright(peer) + ' ' + chalk.redBright('is already on the connections list!') + '\n')
+        }
+        else
+        {
+          session['connections'].push(peer)
+          console.log('\n' + chalk.greenBright('Added') + ' ' + chalk.yellowBright(peer) + ' ' + chalk.greenBright('to the connections list!') + '\n')
+          save()
+        }
       }
-      // provided peer argument is a friendly name
       else
       {
+        console.log(chalk.redBright('\nInvalid peer argument!\n'))
       }
     break
 
-    // add peer to connect to
-    case 'add':
-      session['connections'].push(peer)
-      save()
-    break
-
-    // remove peer to connect to
+    // remove connection
     case 'remove':
-      session['connections'] = session['connections'].filter(i => i[0] !== peer)
-      save()
+      if (peer !== undefined && peer.substring(0,2) == 'Qm')
+      {
+        read()
+        if (session['connections'].indexOf(peer) >= 0)
+        {
+          session['connections'] = session['connections'].filter(i => i !== peer)
+          console.log('\n' + chalk.greenBright('Removed') + ' ' + chalk.yellowBright(peer) + ' ' + chalk.greenBright('from the connections list!') + '\n')
+          save()
+        }
+        else
+        {
+          console.log('\n' + chalk.yellowBright(peer) + ' ' + chalk.redBright('is not on the connections list!') + '\n')
+        }
+      }
+      else
+      {
+        console.log(chalk.redBright('\nInvalid peer argument!\n'))
+      }
     break
 
-    // list peers that the app is connecting to
+    // list all peers that are allowed to communicate
     case 'list':
+      read()
       return session['connections']
     break
 
@@ -177,14 +285,12 @@ var connections = (command, peer) =>
 
 }
 
-// ipfs id
-var id = (id) =>
-{
-  session['id'] = id
-  save()
-
-
-}
+// // ipfs id
+// var id = (id) =>
+// {
+//   session['id'] = id
+//   save()
+// }
 
 // save IPFS id
 var id = (command, id) =>
