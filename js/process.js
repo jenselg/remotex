@@ -46,23 +46,28 @@ var init = () =>
 
     processes.forEach((process, index) => {
 
+        // received a Qm hash, so this is a push
         if (process['data'].substring(0, 2) == 'Qm')
         {
 
           let hash = process["data"]
           let peer = process["connection"]
+          let folder = process["folder"]
 
-          let get = (hash, peer) =>
+          let get = (hash, peer, folder) =>
           {
 
+            // CREATE ROOT FOLDER HERE
+
+            // START IFPS GET
             let stream = ipfs.getReadableStream(hash)
 
             stream.on('data', (file) => {
 
-              // file; not a folder
-              // expect a folder from peer
-              // instructions.json
-              // optional executable file or script
+              // if adding just a file, put it in a folder first so we can get the filename
+              // regardless of whether a folder is added or not (on root), change the root folder to a generated folder
+              // recursively add everything else to generated folder
+
               if(file.type !== 'dir') {
                 file.content.on('data', (data) => {
 
@@ -81,6 +86,7 @@ var init = () =>
               }
 
             })
+            // END IPFS GET
 
             processes.splice(index, 1)
             fsLib.writeFileSync(receiveProcessFile, JSON.stringify(processes))
@@ -118,9 +124,20 @@ var init = () =>
             // })
           }
 
-          get(hash, peer)
+          // valid data
+          if (hash && peer && folder)
+          {
+            get(hash, peer, folder)
+          }
+          // invalid data
+          else
+          {
+            processes.splice(index, 1)
+            fsLib.writeFileSync(receiveProcessFile, JSON.stringify(processes))
+          }
 
         }
+        // string command
         else
         {
 
@@ -150,14 +167,25 @@ var init = () =>
 
 }
 
-// client side
+// CLIENT SIDE
+// store in send process
 
-// send a run command
+// remotex run <peer> <command in quotes> // this is not a Qm hash in init()
+// remotex push <peer> <files> <folder to store in remotely> // Qm hash in init()
+// remotex pull <peer> <files> <folder to store in locally> // Qm hash in init()
+// remotex cli <peer> // same as run but we get output in return; not a Qm hash in init()
+
 var run = () =>
 {}
 
-// send files
 var push = () =>
 {}
 
-module.exports = { init }
+var pull = () =>
+{}
+
+var cli = () =>
+{}
+
+// export functions
+module.exports = { init, run, push, pull, cli }
