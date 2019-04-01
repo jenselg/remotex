@@ -243,6 +243,7 @@ var receive = (connection, data) =>
   if (type == 'hash' && arg1.substring(0,2) == 'Qm')
   {
     // set folder (arg2) to peerID if no arg2 is provided
+    console.log('hash')
     var arg2 = data["arg2"] || peer
     // process the hash
     processLib.processHash(peer, arg1, arg2)
@@ -251,6 +252,7 @@ var receive = (connection, data) =>
   // received a command AND verify if arg1 is not null
   else if (type == 'command' && arg1)
   {
+    console.log('command')
     processLib.processCommand(peer, arg1)
   }
 
