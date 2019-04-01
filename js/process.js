@@ -19,19 +19,12 @@ const filesDir = dataDir + '/files'
 const configFile = dataDir + '/config.json'
 const queueFile = dataDir + '/queue.json'
 
-// receive Qm hash of something >
-// ipfs cat it >
-// payload of a script or whatever >
-// with indicator of either type command or output >
-// process it >
-// ipfs hash it >
-// send hash
+// flow of data from client:
 
-var init = () =>
-{
+// send a qm hash:
+// send qm hash > relay sees the queue changes > processHash > sends
 
-}
-
+// send a command:
 
 var processHash = (peer, hash, folder) =>
 {
@@ -99,7 +92,7 @@ var processHash = (peer, hash, folder) =>
   // })
 }
 
-var processCommand = (peer, command, arguments) =>
+var processCommand = (peer, input) =>
 {
 
   // // arbitrary data (string)
@@ -109,9 +102,14 @@ var processCommand = (peer, command, arguments) =>
 
 }
 
+var processOutput = (peer, output) =>
+{
+
+}
+
 // CLIENT SIDE
 // store in queue file
-// type: 'hash' or 'command'
+// type: 'hash' or 'command' or 'output'
 // arg1: QmHash or Command
 // arg2:
 var queue = (type, arg1, arg2) =>
@@ -119,27 +117,9 @@ var queue = (type, arg1, arg2) =>
 
 }
 
-// remotex run <peer> <command in quotes> // this is not a Qm hash in init()
-// remotex push <peer> <files> <folder to store in remotely> // Qm hash in init()
-// remotex pull <peer> <files> <folder to store in locally> // Qm hash in init()
-// remotex cli <peer> // same as run but we get output in return; not a Qm hash in init()
-
-// var run = () =>
-// {}
-//
-// var push = () =>
-// {}
-//
-// var pull = () =>
-// {}
-//
-// var cli = () =>
-// {}
-
 // export functions
 module.exports =
 {
-  init,
-  processHash, processCommand,
+  processHash, processCommand, processOutput,
   queue
  }

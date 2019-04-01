@@ -46,11 +46,11 @@ var init = () =>
   if (!fsLib.existsSync(queueFile))
   {
     fsLib.writeFileSync(queueFile, JSON.stringify( [] ))
-    console.log(' - Created queue file!')
+    console.log(` ${chalk.magenta('+++')} Created new queue file.`)
   }
   else
   {
-    console.log(' - Loaded existing queue file!')
+    console.log(` ${chalk.magenta('===')} Loaded existing queue file.`)
   }
 
   // config file exists
@@ -64,7 +64,7 @@ var init = () =>
     error('clear')
 
     // log and return
-    console.log(' - Loaded existing config file!\n')
+    console.log(` ${chalk.magenta('===')} Loaded existing config file.`)
     return session
 
   }
@@ -82,7 +82,7 @@ var init = () =>
     fsLib.writeFileSync(configFile, JSON.stringify(session))
 
     // log and return
-    console.log(' - Created new config file!\n')
+    console.log(` ${chalk.magenta('+++')} Created new config file.`)
     return session
 
   }
@@ -145,7 +145,8 @@ var whitelist = (command, peer) =>
         read()
         if (session['whitelist'].indexOf(peer) >= 0)
         {
-          console.log('\n' + chalk.yellowBright(peer) + ' ' + chalk.redBright('is already on the whitelist!') + '\n')
+          console.log(`\n ${chalk.redBright('!!!')} Already on the whitelist:`)
+          console.log(`     ${chalk.yellowBright(peer)}\n`)
         }
         else
         {
@@ -155,13 +156,14 @@ var whitelist = (command, peer) =>
             fsLib.mkdirSync(peerDir)
           }
           session['whitelist'].push(peer)
-          console.log('\n' + chalk.greenBright('Added') + ' ' + chalk.yellowBright(peer) + ' ' + chalk.greenBright('to the whitelist!') + '\n')
+          console.log(`\n ${chalk.greenBright('!!!')} Added to the whitelist:`)
+          console.log(`     ${chalk.yellowBright(peer)}\n`)
           save()
         }
       }
       else
       {
-        console.log(chalk.redBright('\nInvalid peer argument!\n'))
+        console.log(`\n ${chalk.redBright('!!!')} Invalid peer argument!\n`)
       }
     break
 
@@ -173,17 +175,19 @@ var whitelist = (command, peer) =>
         if (session['whitelist'].indexOf(peer) >= 0)
         {
           session['whitelist'] = session['whitelist'].filter(i => i !== peer)
-          console.log('\n' + chalk.greenBright('Removed') + ' ' + chalk.yellowBright(peer) + ' ' + chalk.greenBright('from the whitelist!') + '\n')
+          console.log(`\n ${chalk.greenBright('!!!')} Removed from the whitelist:`)
+          console.log(`     ${chalk.yellowBright(peer)}\n`)
           save()
         }
         else
         {
-          console.log('\n' + chalk.yellowBright(peer) + ' ' + chalk.redBright('is not on the whitelist!') + '\n')
+          console.log(`\n ${chalk.redBright('!!!')} Not on the whitelist:`)
+          console.log(`     ${chalk.yellowBright(peer)}\n`)
         }
       }
       else
       {
-        console.log(chalk.redBright('\nInvalid peer argument!\n'))
+        console.log(`\n ${chalk.redBright('!!!')} Invalid peer argument!\n`)
       }
     break
 
@@ -223,18 +227,20 @@ var connections = (command, peer) =>
         read()
         if (session['connections'].indexOf(peer) >= 0)
         {
-          console.log('\n' + chalk.yellowBright(peer) + ' ' + chalk.redBright('is already on the connections list!') + '\n')
+          console.log(`\n ${chalk.redBright('!!!')} Already on the connections list:`)
+          console.log(`     ${chalk.yellowBright(peer)}\n`)
         }
         else
         {
           session['connections'].push(peer)
-          console.log('\n' + chalk.greenBright('Added') + ' ' + chalk.yellowBright(peer) + ' ' + chalk.greenBright('to the connections list!') + '\n')
+          console.log(`\n ${chalk.greenBright('!!!')} Added to the connections list:`)
+          console.log(`     ${chalk.yellowBright(peer)}\n`)
           save()
         }
       }
       else
       {
-        console.log(chalk.redBright('\nInvalid peer argument!\n'))
+        console.log(`\n ${chalk.redBright('!!!')} Invalid peer argument!\n`)
       }
     break
 
@@ -246,17 +252,19 @@ var connections = (command, peer) =>
         if (session['connections'].indexOf(peer) >= 0)
         {
           session['connections'] = session['connections'].filter(i => i !== peer)
-          console.log('\n' + chalk.greenBright('Removed') + ' ' + chalk.yellowBright(peer) + ' ' + chalk.greenBright('from the connections list!') + '\n')
+          console.log(`\n ${chalk.greenBright('!!!')} Removed from the connections list:`)
+          console.log(`     ${chalk.yellowBright(peer)}\n`)
           save()
         }
         else
         {
-          console.log('\n' + chalk.yellowBright(peer) + ' ' + chalk.redBright('is not on the connections list!') + '\n')
+          console.log(`\n ${chalk.redBright('!!!')} Not on the connections list:`)
+          console.log(`     ${chalk.yellowBright(peer)}\n`)
         }
       }
       else
       {
-        console.log(chalk.redBright('\nInvalid peer argument!\n'))
+        console.log(`\n ${chalk.redBright('!!!')} Invalid peer argument!\n`)
       }
     break
 
@@ -272,13 +280,6 @@ var connections = (command, peer) =>
   }
 
 }
-
-// // ipfs id
-// var id = (id) =>
-// {
-//   session['id'] = id
-//   save()
-// }
 
 // save IPFS id
 var id = (command, id) =>

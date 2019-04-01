@@ -47,26 +47,40 @@ var init = () =>
   // no errors so run our init
   else
   {
+
     // wait for IPFS to be ready
+    console.log(`\n ${chalk.gray('---')} RemoteX is loading...\n`)
+
     ipfs.on('ready', () => {
 
-      // console.log('\n RemoteX ID: ' + identity.id + '\n')
-      // console.log(' - Add your RemoteX ID on remote systems to connect to this system')
-      // console.log(' - Make sure to whitelist said remote systems on this system\n')
-      // console.log(' From another system:')
-      // console.log(' remotex connections add ' + identity.id + '\n')
-      // console.log(' From this system:')
-      // console.log(' remotex whitelist add <Remote System RemoteX ID>\n')
-      console.log(` - RemoteX is ready!`)
-      // listen to own channel
-      listen()
-      // array of peers
-      var connections = configLib.connections('list')
-      // iterate through peers pubsub channels
-      connections.forEach((value, index) =>
+      ipfs.id((err, identity) =>
       {
-        connect(value)
+
+        // throw err if exist
+        if (err) { throw err }
+
+        // push id to config file
+        configLib.id('update', identity.id)
+
+        // ipfs is completely ready, run everything else...
+
+        // inform cli
+        console.log(` ${chalk.greenBright('!!!')} RemoteX is ready!`)
+
+        // listen to own channel
+        listen()
+
+        // array of peers
+        var connections = configLib.connections('list')
+
+        // iterate through peers pubsub channels
+        connections.forEach((value, index) =>
+        {
+          connect(value)
+        })
+
       })
+
     })
   }
 
@@ -117,18 +131,6 @@ var connect = (name) =>
 // listen to own channel
 var listen = () =>
 {
-
-  // id function
-  ipfs.id((err, identity) =>
-  {
-
-    // throw err if exist
-    if (err) { throw err }
-
-    // push id to config file
-    configLib.id('update', identity.id)
-
-  })
 
   // define vars and data
   var id = configLib.id('get')
@@ -235,8 +237,9 @@ var receive = (connection, data) =>
 
   // data parts
   var data = JSON.parse(data)
-  var type = data["type"] // 'hash' or 'command'
-  var arg1 = data["arg1"] // QmHash or Command
+  var type = data["type"] // 'hash' or 'command' or 'output'
+  var arg1 = data["arg1"] // QmHash or Command or output
+  // arg2 is if a folder is specified
 
   // received a Qm hash AND verify if arg1 is an actual Qm hash
   if (type == 'hash' && arg1.substring(0,2) == 'Qm')
@@ -250,7 +253,13 @@ var receive = (connection, data) =>
   // received a command AND verify if arg1 is not null
   else if (type == 'command' && arg1)
   {
-    processLib.processCommand(peer, arg1, arg2)
+    processLib.processCommand(peer, arg1)
+  }
+
+  // received an output from a command/hash AND verify if arg1 (output) actually is generated
+  else if (type == 'output' && arg1)
+  {
+    processLib.processOutput(peer, arg1)
   }
 
 }
