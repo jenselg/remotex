@@ -118,10 +118,7 @@ var connect = (name) =>
 
     // send when queue file changes
     queueWatcher.on('change', () => {
-      if (connections[name].hasPeer(name))
-      {
-        send(name)
-      }
+      send(name)
     })
 
   })
@@ -217,7 +214,7 @@ var send = (connection) =>
   {
     if (process["connection"] == connection)
     {
-      var dataBuffer = Buffer.from(process["data"]) // data is an object that's been stringified already
+      var dataBuffer = Buffer.from(JSON.stringify(process["data"])) // data is an object that's been stringified already
       console.log(`\n ${chalk.blueBright('>>>')} Sending data to:`)
       console.log(`     ${chalk.yellowBright(connection)}`)
       connections[connection].sendTo(connection, dataBuffer)
@@ -234,6 +231,7 @@ var receive = (connection, data) =>
 
   // data from
   var peer = connection
+  console.dir(data)
 
   // data parts
   var data = JSON.parse(data)

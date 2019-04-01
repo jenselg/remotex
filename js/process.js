@@ -112,9 +112,27 @@ var processOutput = (peer, output) =>
 // type: 'hash' or 'command' or 'output'
 // arg1: QmHash or Command
 // arg2:
-var queue = (type, arg1, arg2) =>
-{
 
+// for example:
+// npm run remotex process "git clone git@github.com:jenselg/remotex.git" QmNj9zZM9J9hwNqKV9s6rLSmsgPSqjSqb6U11q6hXmZ5BR
+
+var queue = (type, query, peers) =>
+{
+  peers.forEach((peer, index) =>
+  {
+
+    var queueObject = {}
+    queueObject["connection"] = peer
+    queueObject["data"] = {}
+    queueObject["data"]["type"] = type
+    queueObject["data"]["query"] = query
+    console.dir(queueObject)
+
+    var processes = JSON.parse(fsLib.readFileSync(queueFile))
+    processes.push(queueObject)
+    fsLib.writeFileSync(queueFile, JSON.stringify(processes))
+
+  })
 }
 
 // export functions

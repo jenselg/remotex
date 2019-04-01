@@ -11,8 +11,7 @@ const execDir = dataDir + '/exec'
 
 // files
 const configFile = dataDir + '/config.json'
-const receiveProcessFile = dataDir + '/receive-process.json'
-const sendProcessFile = dataDir + '/send-process.json'
+const queueFile = dataDir + '/queue.json'
 
 // internal libs
 const remotex = require('./js/remotex.js')
@@ -21,9 +20,9 @@ const processLib = require('./js/process.js')
 
 // args
 const command = args._[0]
-const arg1 = args._[1]
-const arg2 = args._[2]
-const arg3 = args._[3]
+const arg1 = args._[1] // sub command
+const arg2 = args._[2] // string of command or Qm hash
+const arg3 = args._.slice(3) // array of remote peers
 
 // command case
 switch (command)
@@ -175,7 +174,25 @@ switch (command)
 
   case 'process':
 
-    
+    // console.log(command) // this command
+    // console.log(arg1) // sub command
+    // console.log(arg2) // Qm hash or command string to exec remotely
+    // console.log(arg3) // remote peers
+    switch (arg1)
+    {
+
+      case 'hash':
+        processLib.queue(arg1, arg2, arg3)
+      break
+
+      case 'command':
+        processLib.queue(arg1, arg2, arg3)
+      break
+
+      default:
+        console.log('invalid')
+
+    }
 
   break
 
