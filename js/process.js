@@ -126,7 +126,6 @@ var queue = (type, query, peers) =>
     queueObject["data"] = {}
     queueObject["data"]["type"] = type
     queueObject["data"]["query"] = query
-    console.dir(JSON.parse(queueObject))
 
     var processes = JSON.parse(fsLib.readFileSync(queueFile))
     processes.push(queueObject)

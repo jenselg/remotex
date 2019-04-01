@@ -231,10 +231,10 @@ var receive = (connection, data) =>
 
   // data from
   var peer = connection
-  console.dir(data)
 
   // data parts
   var data = JSON.parse(data)
+  console.dir(data)
   var type = data["type"] // 'hash' or 'command' or 'output'
   var arg1 = data["arg1"] // QmHash or Command or output
   // arg2 is if a folder is specified
