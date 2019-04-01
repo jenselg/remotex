@@ -12,8 +12,7 @@ const filesDir = dataDir + '/files'
 
 // files
 const configFile = dataDir + '/config.json'
-const receiveProcessFile = dataDir + '/receive-process.json'
-const sendProcessFile = dataDir + '/send-process.json'
+const queueFile = dataDir + '/queue.json'
 
 // init
 var init = () =>
@@ -43,26 +42,15 @@ var init = () =>
     fsLib.mkdirSync(filesDir)
   }
 
-  // create process file if it doesnt exist, and inject empty array inside it
-  if (!fsLib.existsSync(receiveProcessFile))
+  // create queue file if it doesnt exist, and inject empty array inside it
+  if (!fsLib.existsSync(queueFile))
   {
-    fsLib.writeFileSync(receiveProcessFile, JSON.stringify( [] ))
-    console.log(' - Created new receive process file!')
+    fsLib.writeFileSync(queueFile, JSON.stringify( [] ))
+    console.log(' - Created queue file!')
   }
   else
   {
-    console.log(' - Loaded existing receive process file!')
-  }
-
-  // create process file if it doesnt exist, and inject empty array inside it
-  if (!fsLib.existsSync(sendProcessFile))
-  {
-    fsLib.writeFileSync(sendProcessFile, JSON.stringify( [] ))
-    console.log(' - Created new send process file!')
-  }
-  else
-  {
-    console.log(' - Loaded existing send process file!')
+    console.log(' - Loaded existing queue file!')
   }
 
   // config file exists

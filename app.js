@@ -55,32 +55,6 @@ switch (command)
   break
 
   //*********************************************************************
-  // 'CLIENT' COMMANDS
-  // CONNECTIONS ARRAY SHOULD NOT BE EMPTY
-  // WE USE THE RESOLVE FUNCTIONS HERE
-  //*********************************************************************
-
-  // exec command in either remote or local (peer passed as arg1)
-  // pass a bash script or json
-  // have special binaries inside a bin folder in RemoteX
-  // each whitelisted peer have their own jail folder for files
-  // remotex run <peer> <processname> <input - stream or command(s)>
-  case 'run':
-  break
-
-  // TBD
-  // binary/script?
-  // hash then send hash, then ipfs get from hash?
-  case 'push':
-  break
-
-  // TBD
-  // binary/script?
-  // hash then send hash, then ipfs get from hash?
-  case 'pull':
-  break
-
-  //*********************************************************************
   // CONFIG COMMANDS
   // ADDING OR REMOVING CONNECTIONS AND WHITELIST
   // FRIENDLY NAME IS OPTIONAL
@@ -194,20 +168,20 @@ switch (command)
 
   break
 
-  // add, remove, list accepted process commands
-  // this is for the listening portion
-  // config format: { name: string, description: string, exec: string }
-  // name: process name to use in run command, no spaces
-  // description: user friendly description for someone using run
-  // exec: file location of executable
-  // ideally, send back output to user
-  // if a file is a result of the output, maybe put in a jailed folder for the peer, hash it, then send the hash back to the user?
-  // when a user uses run without any args, return process list
+  //*********************************************************************
+  // 'CLIENT' COMMANDS
+  // CONNECTIONS ARRAY SHOULD NOT BE EMPTY
+  //*********************************************************************
+
   case 'process':
+
+    
+
   break
 
-  // default
   default:
-    // do nothing; print out available commands
+
+    // 1. get connections list
+    // 2. if user did 'remotex <peerHash> <hash/command> <QmHash/Command>'
 
 }

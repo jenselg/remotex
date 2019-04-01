@@ -16,50 +16,24 @@ const execDir = dataDir + '/exec'
 
 // files
 const configFile = dataDir + '/config.json'
-const receiveProcessFile = dataDir + '/receive-process.json'
-const sendProcessFile = dataDir + '/send-process.json'
-
-// watcher.on('change', path => console.log(`File ${path} has been changed`))
-// process format: { connection: <QmHash>, data: <stream/command> }
+const queueFile = dataDir + '/queue.json'
 
 // declare vars
 var connections = {}
-var receiveWatcher
-var sendWatcher
+var queueWatcher
 
-// init functions
-//
-// var receiveWatchInit = () =>
-// {
-//   // watch process file
-//   receiveWatcher = chokidar.watch(receiveProcessFile, {
-//     ignored: /(^|[\/\\])\../,
-//     persistent: true
-//   })
-//   return receiveWatcher
-// }
-//
-// var sendWatchInit = () =>
-// {
-//   // watch process file
-//   sendWatcher = chokidar.watch(sendProcessFile, {
-//     ignored: /(^|[\/\\])\../,
-//     persistent: true
-//   })
-//   return sendWatcher
-// }
+//*** START NOTES ***//
+
+// Queue File Format
+// [ { "connection": "peerId/Qm hash of who to send to", "data": { "type": "hash/command", "arg1": "QmHash/Command", "arg2": "custom folder name or null" } }, ... ]
+
+//*** END NOTES ***//
 
 var init = () =>
 {
 
   // watch process file
-  receiveWatcher = chokidar.watch(receiveProcessFile, {
-    ignored: /(^|[\/\\])\../,
-    persistent: true
-  })
-
-  // watch process file
-  sendWatcher = chokidar.watch(sendProcessFile, {
+  queueWatcher = chokidar.watch(queueFile, {
     ignored: /(^|[\/\\])\../,
     persistent: true
   })
@@ -73,39 +47,32 @@ var init = () =>
   // no errors so run our init
   else
   {
-
     // wait for IPFS to be ready
     ipfs.on('ready', () => {
 
-      processLib.init()
-
-      // // watch init
-      // receiveWatchInit()
-      // sendWatchInit()
-
+      // console.log('\n RemoteX ID: ' + identity.id + '\n')
+      // console.log(' - Add your RemoteX ID on remote systems to connect to this system')
+      // console.log(' - Make sure to whitelist said remote systems on this system\n')
+      // console.log(' From another system:')
+      // console.log(' remotex connections add ' + identity.id + '\n')
+      // console.log(' From this system:')
+      // console.log(' remotex whitelist add <Remote System RemoteX ID>\n')
+      console.log(` - RemoteX is ready!`)
       // listen to own channel
       listen()
-
       // array of peers
       var connections = configLib.connections('list')
-
       // iterate through peers pubsub channels
       connections.forEach((value, index) =>
       {
-
-        // call listen function and pass channel name
-        // value[0] is Qm hash, since value[1] is friendly name
         connect(value)
-
       })
-
     })
-
   }
 
 }
 
-// connect to peers pubsub channels
+//*** connect to peers ***//
 var connect = (name) =>
 {
   connections[name] = PubSub(ipfs, name)
@@ -114,21 +81,13 @@ var connect = (name) =>
   connections[name].on('subscribed', () =>
   {
 
-    // send when connection peer joins
+    // process queue file when connection peer joins
     connections[name].on('peer joined', (peer) =>
     {
       if (peer == name)
       {
         console.log(`\n ${chalk.greenBright('!!!')} Connected to:`)
         console.log(`     ${chalk.yellowBright(name)}`)
-        send(name)
-      }
-    })
-
-    // send when send file changes
-    sendWatcher.on('change', () => {
-      if (connections[name].hasPeer(name))
-      {
         send(name)
       }
     })
@@ -143,47 +102,54 @@ var connect = (name) =>
       }
     })
 
-    //sendWatcher.on('change', send(name))
-
-    // received reply
-    // connections[name].on('message', (message) =>
-    // {
-    //
-    //   // if came from peer else, ignore it
-    //   if (message.from == name)
-    //   {
-    //
-    //     // if accepted we expect a return value, if not, there's nothing
-    //     // do something about it
-    //     // console.log(name + ': ' + 'got message from ' + message.from + ': ' + message.data.toString()))
-    //
-    //   }
-    //
-    // })
+    // send when queue file changes
+    queueWatcher.on('change', () => {
+      if (connections[name].hasPeer(name))
+      {
+        send(name)
+      }
+    })
 
   })
 
 }
 
-// listen on own channel
+// listen to own channel
 var listen = () =>
 {
 
+  // id function
+  ipfs.id((err, identity) =>
+  {
+
+    // throw err if exist
+    if (err) { throw err }
+
+    // push id to config file
+    configLib.id('update', identity.id)
+
+  })
+
   // define vars and data
-  let id = configLib.id('get')
-  let connection = PubSub(ipfs, id)
+  var id = configLib.id('get')
+  var connection = PubSub(ipfs, id)
 
   // subscribed to own channel success
   connection.on('subscribed', () =>
   {
 
-    console.log(` - Listening on: ${id}`)
+    // when subscribed to own hash, notify user via cli
+    console.log(`\n ${chalk.blueBright('###')} RemoteX daemon listening on:`)
+    console.log(`     ${chalk.yellowBright(id)}`)
 
+    // someone joined the channel
     connection.on('peer joined', (peer) =>
     {
+
       // get whitelist everytime
       let whitelist = configLib.whitelist('list')
 
+      // cli message depending on connection
       if (whitelist.indexOf(peer) >= 0)
       {
         console.log(`\n ${chalk.cyan('###')} Whitelisted connection accepted:`)
@@ -194,8 +160,10 @@ var listen = () =>
         console.log(`\n ${chalk.redBright('!!!')} Non-whitelisted connection detected:`)
         console.log(`     ${chalk.yellowBright(peer)}`)
       }
+
     })
 
+    // someone left the channel
     connection.on('peer left', (peer) =>
     {
       // get whitelist everytime
@@ -213,7 +181,7 @@ var listen = () =>
       }
     })
 
-    // listen for messages
+    // listen for messages in the channel
     connection.on('message', (message) =>
     {
 
@@ -234,68 +202,66 @@ var listen = () =>
 
 }
 
-// monitor processFile variable through chokidar
-// process format: { connection: <QmHash>, data: <stream/command> }
-
-// send data to a connection
+// send data to a connection; from connect()
 var send = (connection) =>
 {
-  // load send process file
-  var processes = JSON.parse(fsLib.readFileSync(sendProcessFile))
 
-  // iterate through process file, if connection matches then send
-  processes.forEach((process, index) => {
-    if (process['connection'] == connection)
+  // load queue file
+  // FORMAT: [ { "connection": "peerId/Qm hash of who to send to", "data": { "type": "hash/command", "arg1": "QmHash/Command", "arg2": "custom folder name or null" } }, ... ]
+  var processes = JSON.parse(fsLib.readFileSync(queueFile))
+
+  // iterate through queue file, if connection matches then send
+  processes.forEach((process, index) =>
+  {
+    if (process["connection"] == connection)
     {
-      var dataBuffer = Buffer.from(process['data'])
+      var dataBuffer = Buffer.from(process["data"]) // data is an object that's been stringified already
       console.log(`\n ${chalk.blueBright('>>>')} Sending data to:`)
       console.log(`     ${chalk.yellowBright(connection)}`)
       connections[connection].sendTo(connection, dataBuffer)
       processes.splice(index, 1)
-      fsLib.writeFileSync(sendProcessFile, JSON.stringify(processes))
+      fsLib.writeFileSync(queueFile, JSON.stringify(processes))
     }
-    // else
-    // {
-    //   console.log(`\n !!! Invalid process entry detected. Please see the following data:\n`)
-    //   console.dir(process)
-    // }
   })
 
 }
 
+// receive data; from listen()
 var receive = (connection, data) =>
 {
-  data = data.toString()
-  var dataObject = {}
-  dataObject['timestamp'] = (new Date).getTime()
-  dataObject['connection'] = connection
-  dataObject['data'] = data
 
-  var processes = JSON.parse(fsLib.readFileSync(receiveProcessFile))
-  processes.push(dataObject)
-  fsLib.writeFileSync(receiveProcessFile, JSON.stringify(processes))
+  // data from
+  var peer = connection
+
+  // data parts
+  var data = JSON.parse(data)
+  var type = data["type"] // 'hash' or 'command'
+  var arg1 = data["arg1"] // QmHash or Command
+
+  // received a Qm hash AND verify if arg1 is an actual Qm hash
+  if (type == 'hash' && arg1.substring(0,2) == 'Qm')
+  {
+    // set folder (arg2) to peerID if no arg2 is provided
+    var arg2 = data["arg2"] || peer
+    // process the hash
+    processLib.processHash(peer, arg1, arg2)
+  }
+
+  // received a command AND verify if arg1 is not null
+  else if (type == 'command' && arg1)
+  {
+    processLib.processCommand(peer, arg1, arg2)
+  }
+
 }
 
 // log error in cli
 var error = () =>
 {
-
+  throw "RemoteX halted!"
   // error message
   console.log(chalk.redBright('Error flag was triggered! Connections and listener halted. Please check logs and restart RemoteX.'))
 
 }
 
-//////////////// LISTENER //////////////////////
-
-// monitor for commands from run using chokidar on a json file
-// sendWatcher.on('change', (path) => {
-//   var processes = JSON.parse(fsLib.readFileSync(sendProcessFile))
-//   processes.forEach((process, index) => {
-//     connections[name].sendTo(name, process['index'])
-//   })
-// })
-
-module.exports =
-{
-  init
-}
+module.exports = { init }
