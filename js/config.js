@@ -13,6 +13,7 @@ const filesDir = dataDir + '/files'
 // files
 const configFile = dataDir + '/config.json'
 const queueFile = dataDir + '/queue.json'
+const outputFile = dataDir + '/output.json'
 
 // init
 var init = () =>
@@ -48,10 +49,21 @@ var init = () =>
     fsLib.writeFileSync(queueFile, JSON.stringify( [] ))
     console.log(` ${chalk.magenta('+++')} Created new queue file.`)
   }
-  else
+  // else
+  // {
+  //   console.log(` ${chalk.magenta('===')} Loaded existing queue file.`)
+  // }
+
+  // create output file if it doesnt exist, and inject empty array inside it
+  if (!fsLib.existsSync(outputFile))
   {
-    console.log(` ${chalk.magenta('===')} Loaded existing queue file.`)
+    fsLib.writeFileSync(outputFile, JSON.stringify( [] ))
+    console.log(` ${chalk.magenta('+++')} Created new output file.`)
   }
+  // else
+  // {
+  //   console.log(` ${chalk.magenta('===')} Loaded existing output file.`)
+  // }
 
   // config file exists
   if (fsLib.existsSync(configFile))
