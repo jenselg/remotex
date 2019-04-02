@@ -13,14 +13,16 @@ const processLib = require('./process.js')
 const homeDir = osLib.homedir()
 const dataDir = homeDir + '/RemoteX'
 const execDir = dataDir + '/exec'
+const inputDir = dataDir  + '/input'
 
 // files
 const configFile = dataDir + '/config.json'
 const queueFile = dataDir + '/queue.json'
+const outputDir = dataDir + '/output'
 
 // declare vars
 var connections = {}
-var queueWatcher
+var inputWatcher
 
 //*** START NOTES ***//
 
@@ -33,7 +35,7 @@ var init = () =>
 {
 
   // watch process file
-  queueWatcher = chokidar.watch(queueFile, {
+  inputWatcher = chokidar.watch(inputDir, {
     ignored: /(^|[\/\\])\../,
     persistent: true
   })
@@ -116,9 +118,19 @@ var connect = (name) =>
       }
     })
 
-    // send when queue file changes
-    queueWatcher.on('change', () => {
-      send(name)
+    // send when files get added to queue folder
+    inputWatcher.on('add', (path) => {
+
+      // input data
+      var inputObject = JSON.parse(fsLib.readFileSync(path))
+      var inputBuffer = Buffer.from(JSON.stringify(inputObject["data"]))
+
+      if (inputObject["connection"] == name)
+      {
+        connections[name].sendTo(name, inputBuffer)
+        fsLib.unlinkSync(path)
+      }
+
     })
 
   })
@@ -202,7 +214,7 @@ var listen = () =>
 }
 
 // send data to a connection; from connect()
-var send = (connection) =>
+var send = (inputObject) =>
 {
 
   // load queue file
@@ -236,31 +248,31 @@ var receive = (connection, data) =>
   var data = JSON.parse(data)
   console.dir(data)
   var type = data["type"] // 'hash' or 'command' or 'output'
-  var arg1 = data["arg1"] // QmHash or Command or output
+  var query = data["query1"] // QmHash or Command or output
   // arg2 is if a folder is specified
 
   // received a Qm hash AND verify if arg1 is an actual Qm hash
-  if (type == 'hash' && arg1.substring(0,2) == 'Qm')
-  {
-    // set folder (arg2) to peerID if no arg2 is provided
-    console.log('hash')
-    var arg2 = data["arg2"] || peer
-    // process the hash
-    processLib.processHash(peer, arg1, arg2)
-  }
-
-  // received a command AND verify if arg1 is not null
-  else if (type == 'command' && arg1)
-  {
-    console.log('command')
-    processLib.processCommand(peer, arg1)
-  }
-
-  // received an output from a command/hash AND verify if arg1 (output) actually is generated
-  else if (type == 'output' && arg1)
-  {
-    processLib.processOutput(peer, arg1)
-  }
+  // if (type == 'hash' && arg1.substring(0,2) == 'Qm')
+  // {
+  //   // set folder (arg2) to peerID if no arg2 is provided
+  //   console.log('hash')
+  //   var arg2 = data["arg2"] || peer
+  //   // process the hash
+  //   processLib.processHash(peer, arg1, arg2)
+  // }
+  //
+  // // received a command AND verify if arg1 is not null
+  // else if (type == 'command' && arg1)
+  // {
+  //   console.log('command')
+  //   processLib.processCommand(peer, arg1)
+  // }
+  //
+  // // received an output from a command/hash AND verify if arg1 (output) actually is generated
+  // else if (type == 'output' && arg1)
+  // {
+  //   processLib.processOutput(peer, arg1)
+  // }
 
 }
 

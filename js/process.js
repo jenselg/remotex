@@ -15,6 +15,9 @@ const execDir = dataDir + '/exec'
 const logDir = dataDir + '/logs'
 const filesDir = dataDir + '/files'
 
+const inputDir = dataDir  + '/input'
+const outputDir = dataDir + '/output'
+
 // files
 const configFile = dataDir + '/config.json'
 const queueFile = dataDir + '/queue.json'
@@ -121,15 +124,15 @@ var queue = (type, query, peers) =>
   peers.forEach((peer, index) =>
   {
 
-    var queueObject = {}
-    queueObject["connection"] = peer
-    queueObject["data"] = {}
-    queueObject["data"]["type"] = type
-    queueObject["data"]["query"] = query
+    var inputObject = {}
+    inputObject["connection"] = peer
+    inputObject["data"] = {}
+    inputObject["data"]["type"] = type
+    inputObject["data"]["query"] = query
 
-    var processes = JSON.parse(fsLib.readFileSync(queueFile))
-    processes.push(queueObject)
-    fsLib.writeFileSync(queueFile, JSON.stringify(processes))
+    var inputFile = inputDir + '/' + (new Date).getTime() + '.json'
+
+    fsLib.writeFileSync(inputFile, JSON.stringify(inputObject))
 
   })
 }

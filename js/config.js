@@ -9,11 +9,13 @@ const dataDir = homeDir + '/RemoteX'
 const execDir = dataDir + '/exec'
 const logDir = dataDir + '/logs'
 const filesDir = dataDir + '/files'
+const inputDir = dataDir  + '/input'
+const outputDir = dataDir + '/output'
 
 // files
 const configFile = dataDir + '/config.json'
-const queueFile = dataDir + '/queue.json'
-const outputFile = dataDir + '/output.json'
+// const queueFile = dataDir + '/queue.json'
+// const outputFile = dataDir + '/output.json'
 
 // init
 var init = () =>
@@ -43,23 +45,35 @@ var init = () =>
     fsLib.mkdirSync(filesDir)
   }
 
-  // create queue file if it doesnt exist, and inject empty array inside it
-  if (!fsLib.existsSync(queueFile))
+  // create inputDir if it doesnt exist
+  if (!fsLib.existsSync(inputDir))
   {
-    fsLib.writeFileSync(queueFile, JSON.stringify( [] ))
-    console.log(` ${chalk.magenta('+++')} Created new queue file.`)
+    fsLib.mkdirSync(inputDir)
   }
-  // else
-  // {
-  //   console.log(` ${chalk.magenta('===')} Loaded existing queue file.`)
-  // }
 
-  // create output file if it doesnt exist, and inject empty array inside it
-  if (!fsLib.existsSync(outputFile))
+  // create outputDir if it doesnt exist
+  if (!fsLib.existsSync(outputDir))
   {
-    fsLib.writeFileSync(outputFile, JSON.stringify( [] ))
-    console.log(` ${chalk.magenta('+++')} Created new output file.`)
+    fsLib.mkdirSync(outputDir)
   }
+
+  // create queue file if it doesnt exist, and inject empty array inside it
+  // if (!fsLib.existsSync(queueFile))
+  // {
+  //   fsLib.writeFileSync(queueFile, JSON.stringify( [] ))
+  //   console.log(` ${chalk.magenta('+++')} Created new queue file.`)
+  // }
+  // // else
+  // // {
+  // //   console.log(` ${chalk.magenta('===')} Loaded existing queue file.`)
+  // // }
+  //
+  // // create output file if it doesnt exist, and inject empty array inside it
+  // if (!fsLib.existsSync(outputFile))
+  // {
+  //   fsLib.writeFileSync(outputFile, JSON.stringify( [] ))
+  //   console.log(` ${chalk.magenta('+++')} Created new output file.`)
+  // }
   // else
   // {
   //   console.log(` ${chalk.magenta('===')} Loaded existing output file.`)
