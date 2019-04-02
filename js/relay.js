@@ -214,28 +214,28 @@ var listen = () =>
 }
 
 // send data to a connection; from connect()
-var send = (inputObject) =>
-{
-
-  // load queue file
-  // FORMAT: [ { "connection": "peerId/Qm hash of who to send to", "data": { "type": "hash/command", "arg1": "QmHash/Command", "arg2": "custom folder name or null" } }, ... ]
-  var processes = JSON.parse(fsLib.readFileSync(queueFile))
-
-  // iterate through queue file, if connection matches then send
-  processes.forEach((process, index) =>
-  {
-    if (process["connection"] == connection)
-    {
-      var dataBuffer = Buffer.from(JSON.stringify(process["data"])) // data is an object that's been stringified already
-      console.log(`\n ${chalk.blueBright('>>>')} Sending data to:`)
-      console.log(`     ${chalk.yellowBright(connection)}`)
-      connections[connection].sendTo(connection, dataBuffer)
-      processes.splice(index, 1)
-      fsLib.writeFileSync(queueFile, JSON.stringify(processes))
-    }
-  })
-
-}
+// var send = (inputObject) =>
+// {
+//
+//   // load queue file
+//   // FORMAT: [ { "connection": "peerId/Qm hash of who to send to", "data": { "type": "hash/command", "arg1": "QmHash/Command", "arg2": "custom folder name or null" } }, ... ]
+//   var processes = JSON.parse(fsLib.readFileSync(queueFile))
+//
+//   // iterate through queue file, if connection matches then send
+//   processes.forEach((process, index) =>
+//   {
+//     if (process["connection"] == connection)
+//     {
+//       var dataBuffer = Buffer.from(JSON.stringify(process["data"])) // data is an object that's been stringified already
+//       console.log(`\n ${chalk.blueBright('>>>')} Sending data to:`)
+//       console.log(`     ${chalk.yellowBright(connection)}`)
+//       connections[connection].sendTo(connection, dataBuffer)
+//       processes.splice(index, 1)
+//       fsLib.writeFileSync(queueFile, JSON.stringify(processes))
+//     }
+//   })
+//
+// }
 
 // receive data; from listen()
 var receive = (connection, data) =>
