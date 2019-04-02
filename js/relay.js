@@ -104,7 +104,6 @@ var connect = (name) =>
       {
         console.log(`\n ${chalk.greenBright('!!!')} Connected to:`)
         console.log(`     ${chalk.yellowBright(name)}`)
-        send(name)
       }
     })
 
