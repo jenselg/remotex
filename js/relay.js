@@ -249,7 +249,10 @@ var receive = (connection, data) =>
 
   // data parts
   var data = JSON.parse(data)
-  console.dir(`     ${data}`)
+  console.log('\n')
+  console.log('Received Data:')
+  console.dir(data)
+  console.log('\n')
   var type = data["type"] // 'hash' or 'command' or 'output'
   var query = data["query1"] // QmHash or Command or output
   // arg2 is if a folder is specified
