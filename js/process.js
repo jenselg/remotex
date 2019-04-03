@@ -124,11 +124,15 @@ var queue = (type, query, peers, timestamp) =>
   console.log(``)
   console.log(` ${chalk.greenBright('!!!')} Processing ${type}:`)
   console.log(`     "${chalk.bold(query)}"\n`)
+
+  var baseTimeStamp = (new Date).getTime()
+
   peers.forEach((peer, index) =>
   {
 
     var inputObject = {}
-    var inputTimestamp = timestamp || ((new Date).getTime() + 5).toString() // make sure it's unique
+    var inputTimestamp = timestamp || baseTimeStamp.toString() // make sure it's unique
+    baseTimeStamp += 1
 
     inputObject["connection"] = peer
     inputObject["data"] = {}
