@@ -128,7 +128,7 @@ var queue = (type, query, peers, timestamp) =>
   {
 
     var inputObject = {}
-    var inputTimestamp = timestamp || (new Date).getTime().toString() + 1 // make sure it's unique
+    var inputTimestamp = timestamp || ((new Date).getTime() + 1).toString() // make sure it's unique
 
     inputObject["connection"] = peer
     inputObject["data"] = {}
