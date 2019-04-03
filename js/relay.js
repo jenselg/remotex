@@ -266,12 +266,33 @@ var receive = (connection, data) =>
   {
     // run the query
     // send output back to peer/connection with the type set as "output"
-    processLib.queue("output", "I received it and processed it!", [peer])
+    processLib.queue("output", "I received it and processed it!", [peer], timestamp)
   }
   // else, save to output folder
   else
   {
+    var outputObject = {}
+    var outputTimestamp = timestamp
 
+    outputObject["connection"] = peer
+    outputObject["data"] = {}
+    outputObject["data"]["type"] = type
+    outputObject["data"]["query"] = query
+    outputObject["data"]["timestamp"] = outputTimestamp
+
+    var outputFile = outputDir + '/' + outputTimestamp + '.json'
+
+    fsLib.writeFile(outputFile, JSON.stringify(outputObject), (err, data) => {
+      if (err) { throw err }
+      else
+      {
+        // watch for incoming file in output folder, referenced by timestamp.json
+        console.log(` ${chalk.blueBright('>>>')} Saving output for:`)
+        console.log(`     ${chalk.yellowBright(peer)}`)
+        console.log(`     ${chalk.gray(outputFile)}`)
+        console.log(``)
+      }
+    })
   }
 
 }

@@ -119,7 +119,7 @@ var processOutput = (peer, output) =>
 // for example:
 // npm run remotex process "git clone git@github.com:jenselg/remotex.git" QmNj9zZM9J9hwNqKV9s6rLSmsgPSqjSqb6U11q6hXmZ5BR
 
-var queue = (type, query, peers) =>
+var queue = (type, query, peers, timestamp) =>
 {
   console.log(``)
   console.log(` ${chalk.greenBright('!!!')} Processing ${type}:`)
@@ -128,7 +128,7 @@ var queue = (type, query, peers) =>
   {
 
     var inputObject = {}
-    var inputTimestamp = (new Date).getTime().toString()
+    var inputTimestamp = timestamp || (new Date).getTime().toString()
 
     inputObject["connection"] = peer
     inputObject["data"] = {}
