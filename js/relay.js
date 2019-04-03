@@ -14,11 +14,10 @@ const homeDir = osLib.homedir()
 const dataDir = homeDir + '/RemoteX'
 const execDir = dataDir + '/exec'
 const inputDir = dataDir  + '/input'
+const outputDir = dataDir + '/output'
 
 // files
 const configFile = dataDir + '/config.json'
-const queueFile = dataDir + '/queue.json'
-const outputDir = dataDir + '/output'
 
 // declare vars
 var connections = {}
@@ -51,7 +50,7 @@ var init = () =>
   {
 
     // wait for IPFS to be ready
-    console.log(`\n ${chalk.gray('---')} RemoteX is loading...\n`)
+    console.log(`\n ${chalk.gray('---')} RemoteX is loading IPFS...\n`)
 
     ipfs.on('ready', () => {
 
@@ -67,7 +66,7 @@ var init = () =>
         // ipfs is completely ready, run everything else...
 
         // inform cli
-        console.log(` ${chalk.greenBright('!!!')} RemoteX is ready!`)
+        console.log(` ${chalk.gray('---')} RemoteX is ready!`)
 
         // listen to own channel
         listen()
@@ -97,6 +96,22 @@ var connect = (name) =>
   connections[name].on('subscribed', () =>
   {
 
+    // input watcher function
+    var inputSender = (path) =>
+    {
+      // input data
+      var inputObject = JSON.parse(fsLib.readFileSync(path))
+      var inputBuffer = Buffer.from(JSON.stringify(inputObject["data"]))
+
+      if (inputObject["connection"] == name)
+      {
+        console.log(`\n ${chalk.blueBright('>>>')} Sending data to:`)
+        console.log(`     ${chalk.yellowBright(name)}`)
+        connections[name].sendTo(name, inputBuffer)
+        fsLib.unlinkSync(path)
+      }
+    }
+
     // process queue file when connection peer joins
     connections[name].on('peer joined', (peer) =>
     {
@@ -118,19 +133,8 @@ var connect = (name) =>
     })
 
     // send when files get added to queue folder
-    inputWatcher.on('add', (path) => {
+    inputWatcher.on('add', (path) => { inputSender(path) })
 
-      // input data
-      var inputObject = JSON.parse(fsLib.readFileSync(path))
-      var inputBuffer = Buffer.from(JSON.stringify(inputObject["data"]))
-
-      if (inputObject["connection"] == name)
-      {
-        connections[name].sendTo(name, inputBuffer)
-        fsLib.unlinkSync(path)
-      }
-
-    })
 
   })
 
@@ -245,7 +249,7 @@ var receive = (connection, data) =>
 
   // data parts
   var data = JSON.parse(data)
-  console.dir(data)
+  console.dir(`     ${data}`)
   var type = data["type"] // 'hash' or 'command' or 'output'
   var query = data["query1"] // QmHash or Command or output
   // arg2 is if a folder is specified

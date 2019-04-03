@@ -14,8 +14,6 @@ const outputDir = dataDir + '/output'
 
 // files
 const configFile = dataDir + '/config.json'
-// const queueFile = dataDir + '/queue.json'
-// const outputFile = dataDir + '/output.json'
 
 // init
 var init = () =>
@@ -90,7 +88,7 @@ var init = () =>
     error('clear')
 
     // log and return
-    console.log(` ${chalk.magenta('===')} Loaded existing config file.`)
+    console.log(` ${chalk.gray('---')} RemoteX is loading existing config file...`)
     return session
 
   }
@@ -108,7 +106,7 @@ var init = () =>
     fsLib.writeFileSync(configFile, JSON.stringify(session))
 
     // log and return
-    console.log(` ${chalk.magenta('+++')} Created new config file.`)
+    console.log(` ${chalk.gray('---')} RemoteX is creating new config file...`)
     return session
 
   }

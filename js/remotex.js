@@ -17,7 +17,7 @@ var init = () =>
   console.log(` Powered by the IPFS network\n`)
   console.log(` By: Jensel Gatchalian <jensel.gatchalian@gmail.com>\n`)
 
-  console.log(` ${chalk.gray('---')} Starting RemoteX...\n`)
+  console.log(` ${chalk.gray('---')} RemoteX is starting...\n`)
 
   // wait for config init
   if (configLib.init())

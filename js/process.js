@@ -125,12 +125,15 @@ var queue = (type, query, peers) =>
   {
 
     var inputObject = {}
+    var inputTimestamp = (new Date).getTime().toString()
+
     inputObject["connection"] = peer
     inputObject["data"] = {}
     inputObject["data"]["type"] = type
     inputObject["data"]["query"] = query
+    inputObject["data"]["timestamp"] = inputTimestamp
 
-    var inputFile = inputDir + '/' + (new Date).getTime() + '.json'
+    var inputFile = inputDir + '/' + inputTimestamp + '.json'
 
     fsLib.writeFileSync(inputFile, JSON.stringify(inputObject))
 
