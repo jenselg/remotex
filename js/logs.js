@@ -3,6 +3,7 @@ const fsLib = require('fs')
 const osLib = require('os')
 
 // directories
+const homeDir = osLib.homedir()
 const dataDir = homeDir + '/RemoteX'
 const logDir = dataDir + '/logs'
 
