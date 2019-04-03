@@ -6,6 +6,7 @@ const configLib = require('./config.js')
 const cryptoLib = require('./crypto.js')
 const ipfsLib = require('./ipfs.js')
 const relayLib = require('./relay.js')
+const logLib = require('./logs.js')
 
 // init app
 var init = () =>
@@ -32,10 +33,6 @@ var init = () =>
       // init relay
       relayLib.init()
 
-  }
-  else
-  {
-    console.log(` ${chalk.redBright('---')} RemoteX halted! Please check logs for information.`)
   }
 
 }

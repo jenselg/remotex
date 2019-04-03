@@ -107,6 +107,10 @@ var connect = (name) =>
       {
         console.log(`\n ${chalk.blueBright('>>>')} Sending data to:`)
         console.log(`     ${chalk.yellowBright(name)}`)
+        console.log('\n')
+        console.log('Sent Data:')
+        console.dir(inputObject["data"])
+        console.log('\n')
         connections[name].sendTo(name, inputBuffer)
         fsLib.unlinkSync(path)
       }
@@ -254,31 +258,21 @@ var receive = (connection, data) =>
   console.dir(data)
   console.log('\n')
   var type = data["type"] // 'hash' or 'command' or 'output'
-  var query = data["query1"] // QmHash or Command or output
-  // arg2 is if a folder is specified
+  var query = data["query"] // QmHash or Command or output
+  var timestamp = data["timestamp"]
 
-  // received a Qm hash AND verify if arg1 is an actual Qm hash
-  // if (type == 'hash' && arg1.substring(0,2) == 'Qm')
-  // {
-  //   // set folder (arg2) to peerID if no arg2 is provided
-  //   console.log('hash')
-  //   var arg2 = data["arg2"] || peer
-  //   // process the hash
-  //   processLib.processHash(peer, arg1, arg2)
-  // }
-  //
-  // // received a command AND verify if arg1 is not null
-  // else if (type == 'command' && arg1)
-  // {
-  //   console.log('command')
-  //   processLib.processCommand(peer, arg1)
-  // }
-  //
-  // // received an output from a command/hash AND verify if arg1 (output) actually is generated
-  // else if (type == 'output' && arg1)
-  // {
-  //   processLib.processOutput(peer, arg1)
-  // }
+  // run query if it's not an output
+  if (type !== 'output')
+  {
+    // run the query
+    // send output back to peer/connection with the type set as "output"
+    processLib.queue("output", "I received it and processed it!", [peer])
+  }
+  // else, save to output folder
+  else
+  {
+
+  }
 
 }
 

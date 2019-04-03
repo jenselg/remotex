@@ -55,28 +55,6 @@ var init = () =>
     fsLib.mkdirSync(outputDir)
   }
 
-  // create queue file if it doesnt exist, and inject empty array inside it
-  // if (!fsLib.existsSync(queueFile))
-  // {
-  //   fsLib.writeFileSync(queueFile, JSON.stringify( [] ))
-  //   console.log(` ${chalk.magenta('+++')} Created new queue file.`)
-  // }
-  // // else
-  // // {
-  // //   console.log(` ${chalk.magenta('===')} Loaded existing queue file.`)
-  // // }
-  //
-  // // create output file if it doesnt exist, and inject empty array inside it
-  // if (!fsLib.existsSync(outputFile))
-  // {
-  //   fsLib.writeFileSync(outputFile, JSON.stringify( [] ))
-  //   console.log(` ${chalk.magenta('+++')} Created new output file.`)
-  // }
-  // else
-  // {
-  //   console.log(` ${chalk.magenta('===')} Loaded existing output file.`)
-  // }
-
   // config file exists
   if (fsLib.existsSync(configFile))
   {
@@ -88,7 +66,7 @@ var init = () =>
     error('clear')
 
     // log and return
-    console.log(` ${chalk.gray('---')} RemoteX is loading existing config file...`)
+    console.log(` ${chalk.gray('---')} RemoteX is loading an existing config file...`)
     return session
 
   }
@@ -106,7 +84,7 @@ var init = () =>
     fsLib.writeFileSync(configFile, JSON.stringify(session))
 
     // log and return
-    console.log(` ${chalk.gray('---')} RemoteX is creating new config file...`)
+    console.log(` ${chalk.gray('---')} RemoteX is creating a new config file...`)
     return session
 
   }

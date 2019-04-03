@@ -121,6 +121,9 @@ var processOutput = (peer, output) =>
 
 var queue = (type, query, peers) =>
 {
+  console.log(``)
+  console.log(` ${chalk.greenBright('!!!')} Processing ${type}:`)
+  console.log(`     "${chalk.bold(query)}"\n`)
   peers.forEach((peer, index) =>
   {
 
@@ -135,7 +138,17 @@ var queue = (type, query, peers) =>
 
     var inputFile = inputDir + '/' + inputTimestamp + '.json'
 
-    fsLib.writeFileSync(inputFile, JSON.stringify(inputObject))
+    fsLib.writeFile(inputFile, JSON.stringify(inputObject), (err, data) => {
+      if (err) { throw err }
+      else
+      {
+        // watch for incoming file in output folder, referenced by timestamp.json
+        console.log(` ${chalk.blueBright('>>>')} Sending ${type} to:`)
+        console.log(`     ${chalk.yellowBright(peer)}`)
+        console.log(`     ${chalk.gray(inputFile)}`)
+        console.log(``)
+      }
+    })
 
   })
 }
