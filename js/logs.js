@@ -3,6 +3,7 @@ const fsLib = require('fs')
 const osLib = require('os')
 
 // directories
+const dataDir = homeDir + '/RemoteX'
 const logDir = dataDir + '/logs'
 
 var add = (data) =>
@@ -14,7 +15,7 @@ var add = (data) =>
   fsLib.writeFile(logFile, data, (err, data) => {
     if (err) { throw err }
   })
-  
+
 }
 
 module.exports = { add }
