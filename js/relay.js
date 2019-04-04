@@ -107,10 +107,10 @@ var connect = (name) =>
       {
         console.log(`\n ${chalk.blueBright('>>>')} Sending data to:`)
         console.log(`     ${chalk.yellowBright(name)}`)
-        console.log('\n')
-        console.log('Sent Data:')
-        console.dir(inputObject["data"])
-        console.log('\n')
+        // console.log('\n')
+        // console.log('Sent Data:')
+        // console.dir(inputObject["data"])
+        // console.log('\n')
         connections[name].sendTo(name, inputBuffer)
         fsLib.unlinkSync(path)
       }
@@ -253,10 +253,10 @@ var receive = (connection, data) =>
 
   // data parts
   var data = JSON.parse(data)
-  console.log('\n')
-  console.log('Received Data:')
-  console.dir(data)
-  console.log('\n')
+  // console.log('\n')
+  // console.log('Received Data:')
+  // console.dir(data)
+  // console.log('\n')
   var type = data["type"] // 'hash' or 'command' or 'output'
   var query = data["query"] // QmHash or Command or output
   var timestamp = data["timestamp"]
